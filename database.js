@@ -1,6 +1,20 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
+export class DatabaseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "DatabaseError";
+  }
+}
+
+export class ConstraintViolationError extends DatabaseError {
+  constructor(message) {
+    super(message);
+    this.name = "ConstraintViolationError";
+  }
+}
+
 let db;
 
 export const initDb = async () => {
@@ -19,24 +33,33 @@ export const initDb = async () => {
   )`);
 
   db = dbInstance;
+
+  console.log("[initDb] Database initialized");
 };
 
-export const insertUser = ({ username, password }) => {
-  if (!db) {
-    return;
-  }
+export const insertUser = async ({ username, password }) => {
+  try {
+    await db.run(
+      "INSERT INTO users (username, password) VALUES (?, ?)",
+      username,
+      password
+    );
+  } catch (err) {
+    console.error("[insertUser]", err);
 
-  return db.run(
-    "INSERT INTO users (username, password) VALUES (?, ?)",
-    username,
-    password
-  );
+    if (err.code === "SQLITE_CONSTRAINT") {
+      throw new ConstraintViolationError();
+    } else {
+      throw new DatabaseError();
+    }
+  }
 };
 
-export const selectUser = (username) => {
-  if (!db) {
-    return;
+export const selectUser = async (username) => {
+  try {
+    await db.get("SELECT * FROM users WHERE username = ?", [username]);
+  } catch (err) {
+    console.error("[selectUser]", err);
+    throw new DatabaseError();
   }
-
-  return db.get("SELECT * FROM users WHERE username = ?", [username]);
 };

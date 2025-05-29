@@ -5,7 +5,7 @@ export const handleLogin = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    console.error("Missing username or password");
+    console.error("[handleLogin] Missing username or password");
     return res.status(400).send("Bad request");
   }
 
@@ -14,7 +14,7 @@ export const handleLogin = async (req, res) => {
   try {
     user = await selectUser(username);
   } catch (err) {
-    console.error("Failed to select user");
+    console.error("[handleLogin] Failed to select user");
     return res.render("login", { error: "Something went wrong" });
   }
 

@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
-import { insertUser } from "../database.js";
+import { ConstraintViolationError, insertUser } from "../database.js";
 
 export const handleSignup = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    console.error("Missing username or password");
+    console.error("[handleSignup] Missing username or password");
     return res.status(400).send("Bad request");
   }
 
@@ -15,11 +15,11 @@ export const handleSignup = async (req, res) => {
       password: createHash("sha256").update(password).digest("hex"),
     });
   } catch (err) {
-    console.error("Failed to insert user");
+    console.error("[handleSignup] Failed to insert user");
 
     let error;
 
-    if (err.code === "SQLITE_CONSTRAINT") {
+    if (err instanceof ConstraintViolationError) {
       error = "Username already taken";
     } else {
       error = "Something went wrong";
