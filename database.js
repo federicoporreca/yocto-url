@@ -32,9 +32,14 @@ export const initDb = async () => {
     password TEXT NOT NULL
   )`);
 
-  db = dbInstance;
+  await dbInstance.run(`CREATE TABLE IF NOT EXISTS urls (
+    slug TEXT PRIMARY KEY NOT NULL,
+    username TEXT NOT NULL,
+    original_url TEXT NOT NULL,
+    visits INT DEFAULT 0
+  )`);
 
-  console.log("[initDb] Database initialized");
+  db = dbInstance;
 };
 
 export const insertUser = async ({ username, password }) => {
@@ -45,8 +50,6 @@ export const insertUser = async ({ username, password }) => {
       password
     );
   } catch (err) {
-    console.error("[insertUser]", err);
-
     if (err.code === "SQLITE_CONSTRAINT") {
       throw new ConstraintViolationError();
     } else {
@@ -57,9 +60,49 @@ export const insertUser = async ({ username, password }) => {
 
 export const selectUser = async (username) => {
   try {
-    await db.get("SELECT * FROM users WHERE username = ?", [username]);
+    return await db.get("SELECT * FROM users WHERE username = ?", [username]);
   } catch (err) {
-    console.error("[selectUser]", err);
+    throw new DatabaseError();
+  }
+};
+
+export const insertUrl = async ({ slug, username, originalUrl }) => {
+  try {
+    await db.run(
+      "INSERT INTO urls (slug, username, original_url) VALUES (?, ?, ?);",
+      slug,
+      username,
+      originalUrl
+    );
+  } catch (err) {
+    if (err.code === "SQLITE_CONSTRAINT") {
+      throw new ConstraintViolationError();
+    } else {
+      throw new DatabaseError();
+    }
+  }
+};
+
+export const selectUrl = async (slug) => {
+  try {
+    return await db.get("SELECT * FROM urls WHERE slug = ?", [slug]);
+  } catch (err) {
+    throw new DatabaseError();
+  }
+};
+
+export const selectUrls = async (username) => {
+  try {
+    return await db.all("SELECT * FROM urls WHERE username = ?", [username]);
+  } catch (err) {
+    throw new DatabaseError();
+  }
+};
+
+export const incrementUrlVisits = async (slug) => {
+  try {
+    await db.run("UPDATE urls SET visits = visits + 1 WHERE slug = ?", [slug]);
+  } catch (err) {
     throw new DatabaseError();
   }
 };

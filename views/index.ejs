@@ -3,10 +3,26 @@
     <title>YoctoURL</title>
   </head>
   <body>
+    <% if (username) { %>
+    <h1>Hi <%= username %>! Create a short URL</h1>
+    <form method="POST" action="/urls">
+      <label for="url">URL:</label>
+      <input type="text" id="url" name="url" required />
+      <br />
+      <button type="submit">Shorten</button>
+    </form>
+    <% if (error) { %>
+    <p><%= error %></p>
+    <% }%>
+    <h1>Your short URLs</h1>
+    <% for (let url of urls) { %>
+    <p><%= JSON.stringify(url) %></p>
+    <% } %> <% } else { %>
     <h1>Welcome to YoctoURL!</h1>
     <p>
       <a href="/login">Log in</a> or <a href="/signup">sign up</a> to generate
       short URLs
     </p>
+    <% } %>
   </body>
 </html>

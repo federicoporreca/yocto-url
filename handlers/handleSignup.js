@@ -15,7 +15,7 @@ export const handleSignup = async (req, res) => {
       password: createHash("sha256").update(password).digest("hex"),
     });
   } catch (err) {
-    console.error("[handleSignup] Failed to insert user");
+    console.error("[handleSignup] Database error", err);
 
     let error;
 
