@@ -36,7 +36,13 @@ export const initDb = async () => {
     slug TEXT PRIMARY KEY NOT NULL,
     username TEXT NOT NULL,
     original_url TEXT NOT NULL,
-    visits INT DEFAULT 0
+    expiry TEXT
+  )`);
+
+  await dbInstance.run(`CREATE TABLE IF NOT EXISTS visits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,
+    timestamp TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
 
   db = dbInstance;
@@ -66,13 +72,18 @@ export const selectUser = async (username) => {
   }
 };
 
-export const insertUrl = async ({ slug, username, originalUrl }) => {
+const formatDate = (date) => {
+  return date.toISOString().replace("T", " ").substring(0, 19);
+};
+
+export const insertUrl = async ({ slug, username, originalUrl, expiry }) => {
   try {
     await db.run(
-      "INSERT INTO urls (slug, username, original_url) VALUES (?, ?, ?);",
+      "INSERT INTO urls (slug, username, original_url, expiry) VALUES (?, ?, ?, ?)",
       slug,
       username,
-      originalUrl
+      originalUrl,
+      formatDate(expiry)
     );
   } catch (err) {
     if (err.code === "SQLITE_CONSTRAINT") {
@@ -85,7 +96,10 @@ export const insertUrl = async ({ slug, username, originalUrl }) => {
 
 export const selectUrl = async (slug) => {
   try {
-    return await db.get("SELECT * FROM urls WHERE slug = ?", [slug]);
+    return await db.get(
+      "SELECT * FROM urls WHERE slug = ? AND (expiry IS NULL OR expiry > datetime('now'))",
+      [slug]
+    );
   } catch (err) {
     throw new DatabaseError();
   }
@@ -99,9 +113,9 @@ export const selectUrls = async (username) => {
   }
 };
 
-export const incrementUrlVisits = async (slug) => {
+export const insertVisit = async (slug) => {
   try {
-    await db.run("UPDATE urls SET visits = visits + 1 WHERE slug = ?", [slug]);
+    await db.run("INSERT INTO visits (slug) VALUES (?);", [slug]);
   } catch (err) {
     throw new DatabaseError();
   }

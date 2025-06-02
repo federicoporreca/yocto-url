@@ -1,10 +1,13 @@
 import express from "express";
 import session from "express-session";
 import { initDb, selectUrls } from "./database.js";
-import { handleSignup } from "./handlers/handleSignup.js";
-import { handleLogin } from "./handlers/handleLogin.js";
-import { handleUrlCreation } from "./handlers/handleUrlCreation.js";
-import { handleRedirectToOriginalUrl } from "./handlers/handleRedirectToOriginalUrl.js";
+import { handleSignup, validateSignupInput } from "./handlers/signup.js";
+import { handleLogin, validateLoginInput } from "./handlers/login.js";
+import {
+  handleUrlCreation,
+  validateUrlCreationInput,
+} from "./handlers/urlCreation.js";
+import { handleRedirect } from "./handlers/redirect.js";
 
 const PORT = 3000;
 
@@ -20,6 +23,8 @@ const checkAuthentication = (req, res, next) => {
 };
 
 const app = express();
+
+app.use(express.static("public"));
 
 app.use(
   session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
@@ -42,18 +47,24 @@ app.get("/signup", (req, res) => {
   res.render("signup", { error: null });
 });
 
-app.post("/signup", express.urlencoded(), handleSignup);
+app.post("/signup", express.urlencoded(), validateSignupInput, handleSignup);
 
 app.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 
-app.post("/login", express.urlencoded(), handleLogin);
+app.post("/login", express.urlencoded(), validateLoginInput, handleLogin);
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  console.log(`[app] Listening on port ${PORT}`);
 });
 
-app.post("/urls", checkAuthentication, express.urlencoded(), handleUrlCreation);
+app.post(
+  "/urls",
+  checkAuthentication,
+  express.urlencoded(),
+  validateUrlCreationInput,
+  handleUrlCreation
+);
 
-app.get("/:slug", handleRedirectToOriginalUrl);
+app.get("/:slug", handleRedirect);

@@ -1,13 +1,19 @@
 import { createHash } from "node:crypto";
 import { selectUser } from "../database.js";
 
-export const handleLogin = async (req, res) => {
+export const validateLoginInput = (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    console.error("[handleLogin] Missing username or password");
+    console.error("[validateLoginInput] Missing username or password");
     return res.status(400).send("Bad request");
   }
+
+  next();
+};
+
+export const handleLogin = async (req, res) => {
+  const { username, password } = req.body;
 
   let user;
 
