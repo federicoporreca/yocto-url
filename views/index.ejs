@@ -11,153 +11,192 @@
       crossorigin="anonymous"
     />
   </head>
-  <body>
+  <body class="bg-light">
     <% if (username) { %>
-    <h1>Hi <%= username %>! Create a short URL</h1>
-    <form method="POST" action="/urls">
-      <div class="mb-3">
-        <label for="url" class="form-label">URL</label>
-        <input type="text" class="form-control" id="url" name="url" required />
+    <div class="container py-5">
+      <div class="text-center mb-5">
+        <h1 class="fw-bold">YoctoURL</h1>
+        <p class="text-muted">
+          Hi <%= username %>! Fill in the form to create a short URL
+        </p>
       </div>
-      <div class="mb-3">
-        <label for="slug" class="form-label">Slug</label>
-        <input
-          type="text"
-          class="form-control"
-          id="slug"
-          name="slug"
-          required
-        />
+      <div class="card mb-4">
+        <div class="card-body">
+          <form method="POST" action="/urls">
+            <div class="mb-3">
+              <label for="url" class="form-label">URL</label>
+              <input
+                type="text"
+                class="form-control"
+                id="url"
+                name="url"
+                placeholder="https://example.com"
+                required
+              />
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-8">
+                <label for="slug" class="form-label">Slug</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="slug"
+                  name="slug"
+                  placeholder="e.g. my-link"
+                  required
+                />
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="random"
+                    name="random"
+                    onchange="handleRandomCheckboxClick(this)"
+                  />
+                  <label for="random" class="form-check-label">Random</label>
+                </div>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="expiry" class="form-label">Expiry</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="expiry"
+                  name="expiry"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="offset" class="form-label">Timezone</label>
+                <select class="form-select" id="offset" name="offset" required>
+                  <option value="-12:00">UTC-12:00</option>
+                  <option value="-11:00">UTC-11:00</option>
+                  <option value="-10:00">UTC-10:00</option>
+                  <option value="-09:00">UTC-09:00</option>
+                  <option value="-08:00">UTC-08:00</option>
+                  <option value="-07:00">UTC-07:00</option>
+                  <option value="-06:00">UTC-06:00</option>
+                  <option value="-05:00">UTC-05:00</option>
+                  <option value="-04:00">UTC-04:00</option>
+                  <option value="-03:00">UTC-03:00</option>
+                  <option value="-02:00">UTC-02:00</option>
+                  <option value="-01:00">UTC-01:00</option>
+                  <option value="+00:00" selected>UTC</option>
+                  <option value="+01:00">UTC+01:00</option>
+                  <option value="+02:00">UTC+02:00</option>
+                  <option value="+03:00">UTC+03:00</option>
+                  <option value="+04:00">UTC+04:00</option>
+                  <option value="+05:00">UTC+05:00</option>
+                  <option value="+06:00">UTC+06:00</option>
+                  <option value="+07:00">UTC+07:00</option>
+                  <option value="+08:00">UTC+08:00</option>
+                  <option value="+09:00">UTC+09:00</option>
+                  <option value="+10:00">UTC+10:00</option>
+                  <option value="+11:00">UTC+11:00</option>
+                  <option value="+12:00">UTC+12:00</option>
+                  <option value="+13:00">UTC+13:00</option>
+                  <option value="+14:00">UTC+14:00</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-check mb-4">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="permanent"
+                name="permanent"
+                onchange="handlePermanentCheckboxClick(this)"
+              />
+              <label for="permanent" class="form-check-label">Permanent</label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Shorten</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="mb-3 form-check">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          id="random"
-          name="random"
-          onchange="handleRandomCheckboxClick(this)"
-        />
-        <label for="random" class="form-check-label">Random</label>
-      </div>
-      <div class="mb-3">
-        <label for="expiry" class="form-label">Expiry</label>
-        <input
-          type="datetime-local"
-          class="form-control"
-          id="expiry"
-          name="expiry"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="offset" class="form-label">Timezone</label>
-        <select class="form-select" id="offset" name="offset" required>
-          <option value="-12:00">UTC-12:00</option>
-          <option value="-11:00">UTC-11:00</option>
-          <option value="-10:00">UTC-10:00</option>
-          <option value="-09:00">UTC-09:00</option>
-          <option value="-08:00">UTC-08:00</option>
-          <option value="-07:00">UTC-07:00</option>
-          <option value="-06:00">UTC-06:00</option>
-          <option value="-05:00">UTC-05:00</option>
-          <option value="-04:00">UTC-04:00</option>
-          <option value="-03:00">UTC-03:00</option>
-          <option value="-02:00">UTC-02:00</option>
-          <option value="-01:00">UTC-01:00</option>
-          <option value="+00:00" selected>UTC</option>
-          <option value="+01:00">UTC+01:00</option>
-          <option value="+02:00">UTC+02:00</option>
-          <option value="+03:00">UTC+03:00</option>
-          <option value="+04:00">UTC+04:00</option>
-          <option value="+05:00">UTC+05:00</option>
-          <option value="+06:00">UTC+06:00</option>
-          <option value="+07:00">UTC+07:00</option>
-          <option value="+08:00">UTC+08:00</option>
-          <option value="+09:00">UTC+09:00</option>
-          <option value="+10:00">UTC+10:00</option>
-          <option value="+11:00">UTC+11:00</option>
-          <option value="+12:00">UTC+12:00</option>
-          <option value="+13:00">UTC+13:00</option>
-          <option value="+14:00">UTC+14:00</option>
-        </select>
-      </div>
-      <div class="mb-3 form-check">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          id="permanent"
-          name="permanent"
-          onchange="handlePermanentCheckboxClick(this)"
-        />
-        <label for="permanent" class="form-check-label">Permanent</label>
-      </div>
-      <button type="submit" class="btn btn-primary">Shorten</button>
-    </form>
-    <% if (error) { %>
-    <p><%= error %></p>
-    <% }%>
-    <h1>Your short URLs</h1>
-    <% for (const [i, value] of urls.entries()) { %>
-    <div class="accordion" id="accordion">
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button
-            class="accordion-button"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapse-<%= i %>"
-            aria-expanded="true"
-            aria-controls="collapseOne"
+      <% if (error) { %>
+      <p><%= error %></p>
+      <% }%>
+      <h4 class="mb-3">Your short URLs</h4>
+      <% for (const [i, value] of urls.entries()) { %>
+      <div class="accordion" id="accordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapse-<%= i %>"
+              aria-expanded="false"
+              aria-controls="collapse-<%= i %>"
+            >
+              <%= value.slug %> (<%= value.original_url %>)
+            </button>
+          </h2>
+          <div
+            id="collapse-<%= i %>"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accordion"
           >
-            <%= value.slug %> (<%= value.original_url %>)
-          </button>
-        </h2>
-        <div
-          id="collapse-<%= i %>"
-          class="accordion-collapse collapse"
-          data-bs-parent="#accordion"
-        >
-          <div class="accordion-body">
-            <% if (value.visits.length === 0) { %>
-            No visits
-            <% } else { %>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Visits</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% for (const day of value.visits) { %>
-                <tr>
-                  <td><%= day.date %></td>
-                  <td><%= day.count %></td>
-                </tr>
-                <% } %>
-              </tbody>
-            </table>
-            <% } %>
+            <div class="accordion-body">
+              <% if (value.visits.length === 0) { %> No visits <% } else { %>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Visits</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (const day of value.visits) { %>
+                  <tr>
+                    <td><%= day.date %></td>
+                    <td><%= day.count %></td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+              <% } %>
+            </div>
           </div>
         </div>
       </div>
-    <% } %> <% } else { %>
-    <h1>Welcome to YoctoURL!</h1>
-    <p>
-      <a href="/login">Log in</a> or <a href="/signup">sign up</a> to generate
-      short URLs
-    </p>
+      <% } %>
+    </div>
+    <% } else { %>
+    <div
+      class="container d-flex flex-column justify-content-center align-items-center vh-100"
+    >
+      <div class="text-center">
+        <h1 class="fw-bold mb-3">Welcome to YoctoURL!</h1>
+        <p class="text-muted mb-4">
+          Create and manage your own custom short URLs
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <a href="/login" class="btn btn-primary btn-lg">Log in</a>
+          <a href="/signup" class="btn btn-outline-secondary btn-lg">Sign up</a>
+        </div>
+      </div>
+    </div>
     <% } %>
     <script>
       const getCurrentUtcOffset = (date = new Date()) => {
         const offset = -date.getTimezoneOffset();
-        const sign = offset >= 0 ? '+' : '-';
-        const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
-        const minutes = String(Math.abs(offset) % 60).padStart(2, '0');
+        const sign = offset >= 0 ? "+" : "-";
+        const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(
+          2,
+          "0"
+        );
+        const minutes = String(Math.abs(offset) % 60).padStart(2, "0");
         return `${sign}${hours}:${minutes}`;
-      }
+      };
 
-      document.getElementById('offset').value = getCurrentUtcOffset()
+      document.getElementById("offset").value = getCurrentUtcOffset();
 
       const slugInput = document.getElementById("slug");
       const expiryInput = document.getElementById("expiry");
