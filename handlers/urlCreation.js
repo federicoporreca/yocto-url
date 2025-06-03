@@ -3,6 +3,7 @@ import {
   insertUrl,
   selectUrls,
 } from "../database.js";
+import { formatUrlsWithStats } from "../utils.js";
 
 const isValidUrl = (str) => {
   try {
@@ -37,7 +38,7 @@ export const validateUrlCreationInput = async (req, res, next) => {
     console.error("[validateUrlCreationInput] Invalid URL");
     return res.render("index", {
       username,
-      urls: await selectUrls(username),
+      urls: formatUrlsWithStats(await selectUrls(username)),
       error: "Invalid URL",
     });
   }
@@ -46,7 +47,7 @@ export const validateUrlCreationInput = async (req, res, next) => {
     console.error("[validateUrlCreationInput] Invalid expiry");
     return res.render("index", {
       username,
-      urls: await selectUrls(username),
+      urls: formatUrlsWithStats(await selectUrls(username)),
       error: "Invalid expiry",
     });
   }
@@ -82,7 +83,7 @@ export const handleUrlCreation = async (req, res) => {
 
       res.render("index", {
         username,
-        urls: await selectUrls(username),
+        urls: formatUrlsWithStats(await selectUrls(username)),
         error: null,
       });
     } catch (err) {
@@ -90,12 +91,12 @@ export const handleUrlCreation = async (req, res) => {
         console.warn("[handleUrlCreation] Constraint violation error", err);
         return res.render("index", {
           username,
-          urls: await selectUrls(username),
+          urls: formatUrlsWithStats(await selectUrls(username)),
           error: "Slug already taken",
         });
       }
 
-      console.error("[handleUrlCreation] Database error", err);
+      console.error("[handleUrlCreation]", err);
       return res.status(500).send("Internal server error");
     }
   }
@@ -120,14 +121,14 @@ export const handleUrlCreation = async (req, res) => {
         continue;
       }
 
-      console.error("[handleUrlCreation] Database error", err);
+      console.error("[handleUrlCreation]", err);
       return res.status(500).send("Internal server error");
     }
   }
 
   res.render("index", {
     username,
-    urls: await selectUrls(username),
+    urls: formatUrlsWithStats(await selectUrls(username)),
     error: null,
   });
 };

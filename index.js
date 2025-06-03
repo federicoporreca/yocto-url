@@ -8,6 +8,7 @@ import {
   validateUrlCreationInput,
 } from "./handlers/urlCreation.js";
 import { handleRedirect } from "./handlers/redirect.js";
+import { formatUrlsWithStats } from "./utils.js";
 
 const PORT = 3000;
 
@@ -40,7 +41,11 @@ app.get("/", async (req, res) => {
     urls = await selectUrls(username);
   }
 
-  res.render("index", { username, urls, error: null });
+  res.render("index", {
+    username,
+    urls: formatUrlsWithStats(urls),
+    error: null,
+  });
 });
 
 app.get("/signup", (req, res) => {

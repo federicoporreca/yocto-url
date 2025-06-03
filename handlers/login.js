@@ -20,7 +20,7 @@ export const handleLogin = async (req, res) => {
   try {
     user = await selectUser(username);
   } catch (err) {
-    console.error("[handleLogin] Database error", err);
+    console.error("[handleLogin]", err);
     return res.render("login", { error: "Something went wrong" });
   }
 

@@ -2,15 +2,16 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
 export class DatabaseError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(err) {
+    super(err.message);
     this.name = "DatabaseError";
+    this.stack = err.stack;
   }
 }
 
 export class ConstraintViolationError extends DatabaseError {
-  constructor(message) {
-    super(message);
+  constructor(err) {
+    super(err);
     this.name = "ConstraintViolationError";
   }
 }
@@ -57,9 +58,9 @@ export const insertUser = async ({ username, password }) => {
     );
   } catch (err) {
     if (err.code === "SQLITE_CONSTRAINT") {
-      throw new ConstraintViolationError();
+      throw new ConstraintViolationError(err);
     } else {
-      throw new DatabaseError();
+      throw new DatabaseError(err);
     }
   }
 };
@@ -68,7 +69,7 @@ export const selectUser = async (username) => {
   try {
     return await db.get("SELECT * FROM users WHERE username = ?", [username]);
   } catch (err) {
-    throw new DatabaseError();
+    throw new DatabaseError(err);
   }
 };
 
@@ -83,13 +84,13 @@ export const insertUrl = async ({ slug, username, originalUrl, expiry }) => {
       slug,
       username,
       originalUrl,
-      formatDate(expiry)
+      expiry ? formatDate(expiry) : null
     );
   } catch (err) {
     if (err.code === "SQLITE_CONSTRAINT") {
-      throw new ConstraintViolationError();
+      throw new ConstraintViolationError(err);
     } else {
-      throw new DatabaseError();
+      throw new DatabaseError(err);
     }
   }
 };
@@ -101,15 +102,27 @@ export const selectUrl = async (slug) => {
       [slug]
     );
   } catch (err) {
-    throw new DatabaseError();
+    throw new DatabaseError(err);
   }
 };
 
 export const selectUrls = async (username) => {
   try {
-    return await db.all("SELECT * FROM urls WHERE username = ?", [username]);
+    return await db.all(
+      `SELECT
+        urls.slug,
+        urls.original_url,
+        expiry,
+        date(visits.timestamp) as visits_date,
+        COUNT(*) as visits_count
+      FROM urls
+      LEFT JOIN visits ON visits.slug = urls.slug
+      WHERE urls.username = 'asd'
+      GROUP BY urls.slug, visits_date
+      ORDER BY urls.slug, visits_date`
+    );
   } catch (err) {
-    throw new DatabaseError();
+    throw new DatabaseError(err);
   }
 };
 
@@ -117,6 +130,6 @@ export const insertVisit = async (slug) => {
   try {
     await db.run("INSERT INTO visits (slug) VALUES (?);", [slug]);
   } catch (err) {
-    throw new DatabaseError();
+    throw new DatabaseError(err);
   }
 };

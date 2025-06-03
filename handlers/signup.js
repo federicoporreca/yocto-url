@@ -27,7 +27,7 @@ export const handleSignup = async (req, res) => {
       console.warn("[handleSignup] Constraint violation error", err);
       error = "Username already taken";
     } else {
-      console.error("[handleSignup] Database error", err);
+      console.error("[handleSignup]", err);
       error = "Something went wrong";
     }
 

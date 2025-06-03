@@ -50,7 +50,7 @@
         />
       </div>
       <div class="mb-3">
-        <label for="offset" class="form-label">Timezone:</label>
+        <label for="offset" class="form-label">Timezone</label>
         <select class="form-select" id="offset" name="offset" required>
           <option value="-12:00">UTC-12:00</option>
           <option value="-11:00">UTC-11:00</option>
@@ -97,8 +97,50 @@
     <p><%= error %></p>
     <% }%>
     <h1>Your short URLs</h1>
-    <% for (let url of urls) { %>
-    <p><%= JSON.stringify(url) %></p>
+    <% for (const [i, value] of urls.entries()) { %>
+    <div class="accordion" id="accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button
+            class="accordion-button"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-<%= i %>"
+            aria-expanded="true"
+            aria-controls="collapseOne"
+          >
+            <%= value.slug %> (<%= value.original_url %>)
+          </button>
+        </h2>
+        <div
+          id="collapse-<%= i %>"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordion"
+        >
+          <div class="accordion-body">
+            <% if (value.visits.length === 0) { %>
+            No visits
+            <% } else { %>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Visits</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const day of value.visits) { %>
+                <tr>
+                  <td><%= day.date %></td>
+                  <td><%= day.count %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+            <% } %>
+          </div>
+        </div>
+      </div>
     <% } %> <% } else { %>
     <h1>Welcome to YoctoURL!</h1>
     <p>
@@ -107,6 +149,16 @@
     </p>
     <% } %>
     <script>
+      const getCurrentUtcOffset = (date = new Date()) => {
+        const offset = -date.getTimezoneOffset();
+        const sign = offset >= 0 ? '+' : '-';
+        const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+        const minutes = String(Math.abs(offset) % 60).padStart(2, '0');
+        return `${sign}${hours}:${minutes}`;
+      }
+
+      document.getElementById('offset').value = getCurrentUtcOffset()
+
       const slugInput = document.getElementById("slug");
       const expiryInput = document.getElementById("expiry");
       const offsetInput = document.getElementById("offset");
