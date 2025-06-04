@@ -9,8 +9,7 @@ import {
 } from "./handlers/urlCreation.js";
 import { handleRedirect } from "./handlers/redirect.js";
 import { formatUrlsWithStats } from "./utils.js";
-
-const PORT = 3000;
+import { PORT } from "./constants.js";
 
 await initDb();
 console.log("[app] Database initialized");

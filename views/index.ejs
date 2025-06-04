@@ -114,7 +114,9 @@
               <label for="permanent" class="form-check-label">Permanent</label>
             </div>
             <div class="d-grid">
-              <button type="submit" class="btn btn-primary">Shorten</button>
+              <button type="submit" class="btn btn-primary">
+                Create short URL
+              </button>
             </div>
           </form>
         </div>
@@ -123,7 +125,9 @@
       <p><%= error %></p>
       <% }%>
       <h4 class="mb-3">Your short URLs</h4>
-      <% for (const [i, value] of urls.entries()) { %>
+      <% if (urls.length === 0) { %>
+      <p class="text-muted">No short URLs yet. Create your first one above!</p>
+      <% } %> <% for (const [i, value] of urls.entries()) { %>
       <div class="accordion" id="accordion">
         <div class="accordion-item">
           <h2 class="accordion-header">
@@ -135,7 +139,7 @@
               aria-expanded="false"
               aria-controls="collapse-<%= i %>"
             >
-              <%= value.slug %> (<%= value.original_url %>)
+              <%= value.short_url %> (<%= value.original_url %>)
             </button>
           </h2>
           <div
@@ -144,7 +148,8 @@
             data-bs-parent="#accordion"
           >
             <div class="accordion-body">
-              <% if (value.visits.length === 0) { %> No visits <% } else { %>
+              <% if (value.visits.length === 0) { %> No visits yet <% } else {
+              %>
               <table class="table">
                 <thead>
                   <tr>

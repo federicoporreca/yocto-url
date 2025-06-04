@@ -117,9 +117,10 @@ export const selectUrls = async (username) => {
         COUNT(*) as visits_count
       FROM urls
       LEFT JOIN visits ON visits.slug = urls.slug
-      WHERE urls.username = 'asd'
+      WHERE urls.username = ?
       GROUP BY urls.slug, visits_date
-      ORDER BY urls.slug, visits_date`
+      ORDER BY urls.slug, visits_date`,
+      [username]
     );
   } catch (err) {
     throw new DatabaseError(err);
