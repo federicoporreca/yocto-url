@@ -33,7 +33,9 @@ app.use(
 app.set("view engine", "ejs");
 
 app.get("/", async (req, res) => {
-  const { username } = req.session;
+  const { username, error, formData } = req.session;
+  delete req.session.error;
+  delete req.session.formData;
   let urls = [];
 
   if (username) {
@@ -43,12 +45,13 @@ app.get("/", async (req, res) => {
   res.render("index", {
     username,
     urls: formatUrlsWithStats(urls),
-    error: null,
+    error,
+    formData,
   });
 });
 
 app.get("/signup", (req, res) => {
-  res.render("signup", { error: null });
+  res.render("signup", { username: null, error: null });
 });
 
 app.post("/signup", express.urlencoded(), validateSignupInput, handleSignup);

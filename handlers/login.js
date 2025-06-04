@@ -21,18 +21,15 @@ export const handleLogin = async (req, res) => {
     user = await selectUser(username);
   } catch (err) {
     console.error("[handleLogin]", err);
-    return res.render("login", { error: "Something went wrong" });
+    return res.render("login", { error: { message: "Something went wrong" } });
   }
 
-  if (
-    user &&
-    user.password === createHash("sha256").update(password).digest("hex")
-  ) {
+  if (user?.password === createHash("sha256").update(password).digest("hex")) {
     req.session.isAuthenticated = true;
     req.session.username = username;
 
     return res.redirect("/");
   }
 
-  res.render("login", { error: "Wrong credentials" });
+  res.render("login", { error: { message: "Wrong credentials" } });
 };

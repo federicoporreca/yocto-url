@@ -21,15 +21,24 @@
       >
         <h4 class="mb-4 text-center">Sign up</h4>
         <form method="POST" action="/signup">
+          <% if (error?.message && !error.field) { %>
+          <div class="alert alert-danger" role="alert">
+            <%= error.message %>
+          </div>
+          <% }%>
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input
               type="text"
-              class="form-control"
+              class="form-control <% if (error?.field === 'username') { %>is-invalid<% }%>"
               id="username"
               name="username"
+              value="<%= username ?? '' %>"
               required
             />
+            <% if (error?.message && error.field === 'username') { %>
+            <div class="invalid-feedback"><%= error.message %></div>
+            <% } %>
           </div>
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
@@ -50,9 +59,6 @@
             </small>
           </div>
         </form>
-        <% if (error) { %>
-        <p><%= error %></p>
-        <% }%>
       </div>
     </div>
     <script

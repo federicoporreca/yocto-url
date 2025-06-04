@@ -32,24 +32,18 @@ export const validateUrlCreationInput = async (req, res, next) => {
     return res.status(400).send("Bad request");
   }
 
-  const { username } = req.session;
-
   if (!isValidUrl(url)) {
     console.error("[validateUrlCreationInput] Invalid URL");
-    return res.render("index", {
-      username,
-      urls: formatUrlsWithStats(await selectUrls(username)),
-      error: "Invalid URL",
-    });
+    req.session.error = { field: "url", message: "Invalid URL" };
+    req.session.formData = { url, slug, random, expiry, offset, permanent };
+    return res.redirect("/");
   }
 
   if (!permanent && !isValidDate(expiry + offset)) {
     console.error("[validateUrlCreationInput] Invalid expiry");
-    return res.render("index", {
-      username,
-      urls: formatUrlsWithStats(await selectUrls(username)),
-      error: "Invalid expiry",
-    });
+    req.session.error = { field: "expiry", message: "Invalid expiry" };
+    req.session.formData = { url, slug, random, expiry, offset, permanent };
+    return res.redirect("/");
   }
 
   next();
@@ -81,19 +75,13 @@ export const handleUrlCreation = async (req, res) => {
         expiry: permanent ? null : new Date(expiryWithOffset),
       });
 
-      res.render("index", {
-        username,
-        urls: formatUrlsWithStats(await selectUrls(username)),
-        error: null,
-      });
+      res.redirect("/");
     } catch (err) {
       if (err instanceof ConstraintViolationError) {
         console.warn("[handleUrlCreation] Constraint violation error", err);
-        return res.render("index", {
-          username,
-          urls: formatUrlsWithStats(await selectUrls(username)),
-          error: "Slug already taken",
-        });
+        req.session.error = { field: "slug", message: "Slug already taken" };
+        req.session.formData = { url, slug, random, expiry, offset, permanent };
+        return res.redirect("/");
       }
 
       console.error("[handleUrlCreation]", err);
@@ -126,9 +114,5 @@ export const handleUrlCreation = async (req, res) => {
     }
   }
 
-  res.render("index", {
-    username,
-    urls: formatUrlsWithStats(await selectUrls(username)),
-    error: null,
-  });
+  res.redirect("/");
 };

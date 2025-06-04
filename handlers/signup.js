@@ -25,13 +25,13 @@ export const handleSignup = async (req, res) => {
 
     if (err instanceof ConstraintViolationError) {
       console.warn("[handleSignup] Constraint violation error", err);
-      error = "Username already taken";
+      error = { field: "username", message: "Username already taken" };
     } else {
       console.error("[handleSignup]", err);
-      error = "Something went wrong";
+      error = { message: "Something went wrong" };
     }
 
-    return res.render("signup", { error });
+    return res.render("signup", { username, error });
   }
 
   req.session.isAuthenticated = true;
