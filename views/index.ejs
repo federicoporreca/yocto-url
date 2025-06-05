@@ -157,9 +157,21 @@
             data-bs-parent="#accordion"
           >
             <div class="accordion-body">
-              <% if (url.visits.length === 0) { %>
-              <span class="text-muted">No visits yet</span> <% } else { %>
-              <table class="table">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div>Total visits: <%= url.total_visits %></div>
+                  <div>Expiry: <%= url.expiry %></div>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-light"
+                  onclick="copyToClipboard('<%= url.short_url %>')"
+                >
+                  Copy short URL
+                </button>
+              </div>
+              <% if (url.visits.length > 0) { %>
+              <table class="table mt-3">
                 <thead>
                   <tr>
                     <th scope="col">Date</th>
@@ -228,6 +240,10 @@
       const handlePermanentCheckboxChange = (checkbox) => {
         expiryInput.disabled = checkbox.checked;
         offsetInput.disabled = checkbox.checked;
+      };
+
+      const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
       };
     </script>
     <% } else { %>

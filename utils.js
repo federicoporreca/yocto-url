@@ -1,5 +1,17 @@
 import { BASE_URL } from "./constants.js";
 
+const formatDate = (str) =>
+  new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  }).format(new Date(str.replace(" ", "T")));
+
 export const formatUrlsWithStats = (rows) => {
   const grouped = {};
 
@@ -10,12 +22,14 @@ export const formatUrlsWithStats = (rows) => {
       grouped[slug] = {
         short_url: `${BASE_URL}/${slug}`,
         original_url,
-        expiry,
+        expiry: expiry ? formatDate(expiry) : "Permanent",
+        total_visits: 0,
         visits: [],
       };
     }
 
     if (visits_date) {
+      grouped[slug].total_visits += visits_count;
       grouped[slug].visits.push({ date: visits_date, count: visits_count });
     }
   }
