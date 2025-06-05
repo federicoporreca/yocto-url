@@ -21,10 +21,8 @@
       >
         <h4 class="mb-4 text-center">Log in</h4>
         <form method="POST" action="/login">
-          <% if (error?.message) { %>
-          <div class="alert alert-danger" role="alert">
-            <%= error.message %>
-          </div>
+          <% if (error) { %>
+          <div class="alert alert-danger" role="alert"><%= error %></div>
           <% }%>
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>

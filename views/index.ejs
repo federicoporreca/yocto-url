@@ -27,14 +27,14 @@
               <label for="url" class="form-label">URL</label>
               <input
                 type="text"
-                class="form-control <%= error?.field === 'url' ? 'is-invalid' : '' %>"
+                class="form-control <%= errors?.url ? 'is-invalid' : '' %>"
                 id="url"
                 name="url"
                 placeholder="https://example.com"
                 required
               />
-              <% if (error?.message && error.field === 'url') { %>
-              <div class="invalid-feedback"><%= error.message %></div>
+              <% if (errors?.url) { %>
+              <div class="invalid-feedback"><%= errors.url %></div>
               <% } %>
             </div>
             <div class="row g-3 mb-3">
@@ -42,15 +42,12 @@
                 <label for="slug" class="form-label">Slug</label>
                 <input
                   type="text"
-                  class="form-control <%= error?.field === 'slug' ? 'is-invalid' : '' %>"
+                  class="form-control <%= errors?.slug ? 'is-invalid' : '' %>"
                   id="slug"
                   name="slug"
                   placeholder="e.g. my-link"
                   required
                 />
-                <% if (error?.message && error.field === 'slug') { %>
-                <div class="invalid-feedback"><%= error.message %></div>
-                <% } %>
               </div>
               <div class="col-md-4 d-flex align-items-end">
                 <div class="form-check mt-2">
@@ -64,19 +61,22 @@
                   <label for="random" class="form-check-label">Random</label>
                 </div>
               </div>
+              <% if (errors?.slug) { %>
+              <div class="d-block invalid-feedback"><%= errors.slug %></div>
+              <% } %>
             </div>
             <div class="mb-3">
               <label for="expiry" class="form-label">Expiry</label>
               <div class="d-flex flex-column flex-md-row gap-2">
                 <input
                   type="datetime-local"
-                  class="form-control <%= error?.field === 'expiry' ? 'is-invalid' : '' %>"
+                  class="form-control <%= errors?.expiry ? 'is-invalid' : '' %>"
                   id="expiry"
                   name="expiry"
                   required
                 />
                 <select
-                  class="form-select <%= error?.field === 'expiry' ? 'is-invalid' : '' %>"
+                  class="form-select <%= errors?.expiry ? 'is-invalid' : '' %>"
                   id="offset"
                   name="offset"
                   required
@@ -110,8 +110,8 @@
                   <option value="+14:00">UTC+14:00</option>
                 </select>
               </div>
-              <% if (error?.message && error.field === 'expiry') { %>
-              <div class="invalid-feedback d-block"><%= error.message %></div>
+              <% if (errors?.expiry) { %>
+              <div class="invalid-feedback d-block"><%= errors.expiry %></div>
               <% } %>
             </div>
             <div class="form-check mb-4">

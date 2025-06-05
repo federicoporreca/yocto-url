@@ -21,17 +21,17 @@ export const handleSignup = async (req, res) => {
       password: createHash("sha256").update(password).digest("hex"),
     });
   } catch (err) {
-    let error;
+    const errors = {};
 
     if (err instanceof ConstraintViolationError) {
       console.warn("[handleSignup] Constraint violation error", err);
-      error = { field: "username", message: "Username already taken" };
+      errors.username = "Username already taken";
     } else {
       console.error("[handleSignup]", err);
-      error = { message: "Something went wrong" };
+      errors.general = "Something went wrong";
     }
 
-    return res.render("signup", { username, error });
+    return res.render("signup", { username, errors });
   }
 
   req.session.isAuthenticated = true;

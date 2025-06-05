@@ -33,8 +33,8 @@ app.use(
 app.set("view engine", "ejs");
 
 app.get("/", async (req, res) => {
-  const { username, error, formData } = req.session;
-  delete req.session.error;
+  const { username, errors, formData } = req.session;
+  delete req.session.errors;
   delete req.session.formData;
   let urls = [];
 
@@ -45,13 +45,13 @@ app.get("/", async (req, res) => {
   res.render("index", {
     username,
     urls: formatUrlsWithStats(urls),
-    error,
+    errors,
     formData,
   });
 });
 
 app.get("/signup", (req, res) => {
-  res.render("signup", { username: null, error: null });
+  res.render("signup", { username: null, errors: null });
 });
 
 app.post("/signup", express.urlencoded(), validateSignupInput, handleSignup);

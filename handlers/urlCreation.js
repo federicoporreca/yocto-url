@@ -1,9 +1,4 @@
-import {
-  ConstraintViolationError,
-  insertUrl,
-  selectUrls,
-} from "../database.js";
-import { formatUrlsWithStats } from "../utils.js";
+import { ConstraintViolationError, insertUrl } from "../database.js";
 
 const isValidUrl = (str) => {
   try {
@@ -32,16 +27,22 @@ export const validateUrlCreationInput = async (req, res, next) => {
     return res.status(400).send("Bad request");
   }
 
+  const errors = {};
+
   if (!isValidUrl(url)) {
     console.error("[validateUrlCreationInput] Invalid URL");
-    req.session.error = { field: "url", message: "Invalid URL" };
+    errors.url = "Invalid URL";
     req.session.formData = { url, slug, random, expiry, offset, permanent };
-    return res.redirect("/");
   }
 
   if (!permanent && !isValidDate(expiry + offset)) {
     console.error("[validateUrlCreationInput] Invalid expiry");
-    req.session.error = { field: "expiry", message: "Invalid expiry" };
+    errors.expiry = "Invalid expiry";
+    req.session.formData = { url, slug, random, expiry, offset, permanent };
+  }
+
+  if (Object.entries(errors).length > 0) {
+    req.session.errors = errors;
     req.session.formData = { url, slug, random, expiry, offset, permanent };
     return res.redirect("/");
   }
@@ -75,11 +76,11 @@ export const handleUrlCreation = async (req, res) => {
         expiry: permanent ? null : new Date(expiryWithOffset),
       });
 
-      res.redirect("/");
+      return res.redirect("/");
     } catch (err) {
       if (err instanceof ConstraintViolationError) {
         console.warn("[handleUrlCreation] Constraint violation error", err);
-        req.session.error = { field: "slug", message: "Slug already taken" };
+        req.session.errors = { slug: "Slug already taken" };
         req.session.formData = { url, slug, random, expiry, offset, permanent };
         return res.redirect("/");
       }

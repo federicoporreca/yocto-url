@@ -21,23 +21,23 @@
       >
         <h4 class="mb-4 text-center">Sign up</h4>
         <form method="POST" action="/signup">
-          <% if (error?.message && !error.field) { %>
+          <% if (errors?.general) { %>
           <div class="alert alert-danger" role="alert">
-            <%= error.message %>
+            <%= errors.general %>
           </div>
           <% }%>
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input
               type="text"
-              class="form-control <% if (error?.field === 'username') { %>is-invalid<% }%>"
+              class="form-control <% if (errors?.username) { %>is-invalid<% }%>"
               id="username"
               name="username"
               value="<%= username ?? '' %>"
               required
             />
-            <% if (error?.message && error.field === 'username') { %>
-            <div class="invalid-feedback"><%= error.message %></div>
+            <% if (errors?.username) { %>
+            <div class="invalid-feedback"><%= errors.username %></div>
             <% } %>
           </div>
           <div class="mb-3">
