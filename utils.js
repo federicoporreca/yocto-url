@@ -1,5 +1,7 @@
 import { BASE_URL } from "./constants.js";
 
+const isPastDate = (str) => new Date(str) < new Date();
+
 const formatDate = (str) =>
   new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -10,7 +12,7 @@ const formatDate = (str) =>
     minute: "2-digit",
     hour12: true,
     timeZoneName: "short",
-  }).format(new Date(str.replace(" ", "T")));
+  }).format(new Date(str));
 
 export const formatUrlsWithStats = (rows) => {
   const grouped = {};
@@ -18,11 +20,14 @@ export const formatUrlsWithStats = (rows) => {
   for (const row of rows) {
     const { slug, original_url, expiry, visits_date, visits_count } = row;
 
+    const expiryAsIso = expiry ? expiry.replace(" ", "T") + "Z" : null;
+
     if (!grouped[slug]) {
       grouped[slug] = {
         short_url: `${BASE_URL}/${slug}`,
         original_url,
-        expiry: expiry ? formatDate(expiry) : "Permanent",
+        expiry: expiry ? formatDate(expiryAsIso) : "Permanent",
+        is_expired: expiry && isPastDate(expiryAsIso),
         total_visits: 0,
         visits: [],
       };

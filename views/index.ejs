@@ -160,7 +160,12 @@
               <div class="d-flex justify-content-between align-items-start">
                 <div>
                   <div>Total visits: <%= url.total_visits %></div>
-                  <div>Expiry: <%= url.expiry %></div>
+                  <div>
+                    Expiry:
+                    <span class="<%= url.is_expired ? 'text-danger' : '' %>"
+                      ><%= url.expiry %></span
+                    >
+                  </div>
                 </div>
                 <button
                   type="button"
