@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import bcrypt from "bcrypt";
 import { selectUser } from "../database.js";
 
 export const validateLoginInput = (req, res, next) => {
@@ -24,7 +24,7 @@ export const handleLogin = async (req, res) => {
     return res.render("login", { error: "Something went wrong" });
   }
 
-  if (user?.password === createHash("sha256").update(password).digest("hex")) {
+  if (user?.password && (await bcrypt.compare(password, user.password))) {
     req.session.isAuthenticated = true;
     req.session.username = username;
 

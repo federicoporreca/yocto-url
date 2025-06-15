@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import bcrypt from "bcrypt";
 import { ConstraintViolationError, insertUser } from "../database.js";
 
 export const validateSignupInput = (req, res, next) => {
@@ -18,7 +18,7 @@ export const handleSignup = async (req, res) => {
   try {
     await insertUser({
       username,
-      password: createHash("sha256").update(password).digest("hex"),
+      password: await bcrypt.hash(password, 10),
     });
   } catch (err) {
     const errors = {};
