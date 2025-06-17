@@ -119,7 +119,7 @@ export const selectUrls = async (username) => {
       LEFT JOIN visits ON visits.slug = urls.slug
       WHERE urls.username = ?
       GROUP BY urls.slug, visits_date
-      ORDER BY urls.slug, visits_date`,
+      ORDER BY urls.slug, visits_date DESC`,
       [username]
     );
   } catch (err) {
