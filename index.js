@@ -24,8 +24,6 @@ const checkAuthentication = (req, res, next) => {
 
 const app = express();
 
-app.use(express.static("public"));
-
 app.use(
   session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
 );
