@@ -73,9 +73,8 @@ export const selectUser = async (username) => {
   }
 };
 
-const formatDate = (date) => {
-  return date.toISOString().replace("T", " ").substring(0, 19);
-};
+const formatDate = (date) =>
+  date.toISOString().replace("T", " ").substring(0, 19);
 
 export const insertUrl = async ({ slug, username, originalUrl, expiry }) => {
   try {
@@ -95,12 +94,23 @@ export const insertUrl = async ({ slug, username, originalUrl, expiry }) => {
   }
 };
 
+const parseDate = (str) => new Date(str.replace(" ", "T") + "Z");
+
 export const selectUrl = async (slug) => {
   try {
-    return await db.get(
+    const url = await db.get(
       "SELECT * FROM urls WHERE slug = ? AND (expiry IS NULL OR expiry > datetime('now'))",
       [slug]
     );
+
+    if (!url) {
+      return null;
+    }
+
+    return {
+      ...url,
+      expiry: url.expiry ? parseDate(url.expiry) : null,
+    };
   } catch (err) {
     throw new DatabaseError(err);
   }
@@ -108,7 +118,7 @@ export const selectUrl = async (slug) => {
 
 export const selectUrls = async (username) => {
   try {
-    return await db.all(
+    const urls = await db.all(
       `SELECT
         urls.slug,
         urls.original_url,
@@ -122,6 +132,11 @@ export const selectUrls = async (username) => {
       ORDER BY urls.slug, visits_date DESC`,
       [username]
     );
+
+    return urls.map((url) => ({
+      ...url,
+      expiry: url.expiry ? parseDate(url.expiry) : null,
+    }));
   } catch (err) {
     throw new DatabaseError(err);
   }
