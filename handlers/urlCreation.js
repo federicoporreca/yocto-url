@@ -1,5 +1,8 @@
 import { ConstraintViolationError, insertUrl } from "../database.js";
 
+const SLUG_CHARSET =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 const isValidUrl = (str) => {
   try {
     new URL(str);
@@ -19,6 +22,18 @@ const isValidDate = (str) => {
   return date.getTime() > Date.now();
 };
 
+const validateSlug = (str) => {
+  if (str.length < 4 || str.length > 12) {
+    return "Length must be within 4 and 12 characters";
+  }
+
+  for (let i = 0; i < str.length; i++) {
+    if (!SLUG_CHARSET.includes(str[i])) {
+      return "Only alphanumeric characters are allowed";
+    }
+  }
+};
+
 export const validateUrlCreationInput = async (req, res, next) => {
   const { url, slug, random, expiry, offset, permanent } = req.body;
 
@@ -32,13 +47,20 @@ export const validateUrlCreationInput = async (req, res, next) => {
   if (!isValidUrl(url)) {
     console.error("[validateUrlCreationInput] Invalid URL");
     errors.url = "Invalid URL";
-    req.session.formData = { url, slug, random, expiry, offset, permanent };
   }
 
   if (!permanent && !isValidDate(expiry + offset)) {
     console.error("[validateUrlCreationInput] Invalid expiry");
     errors.expiry = "Invalid expiry";
-    req.session.formData = { url, slug, random, expiry, offset, permanent };
+  }
+
+  if (slug) {
+    const slugError = validateSlug(slug);
+
+    if (slugError) {
+      console.error("[validateUrlCreationInput] Invalid slug");
+      errors.slug = slugError;
+    }
   }
 
   if (Object.entries(errors).length > 0) {
@@ -51,12 +73,10 @@ export const validateUrlCreationInput = async (req, res, next) => {
 };
 
 const generateSlug = (length = 8) => {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
-    const randIndex = Math.floor(Math.random() * chars.length);
-    result += chars[randIndex];
+    const randIndex = Math.floor(Math.random() * SLUG_CHARSET.length);
+    result += SLUG_CHARSET[randIndex];
   }
   return result;
 };
